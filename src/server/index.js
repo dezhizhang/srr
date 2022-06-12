@@ -1,11 +1,20 @@
 import React from 'react';
-import {
-  renderToString
-} from 'react-dom/server';
+import { renderToString } from 'react-dom/server';
+import { StaticRouter } from 'react-router-dom/server';
+import App from '../index';
+
 const express = require('express');
 
 const app = express();
+
+app.use(express.static('client'))
 app.get('*', (req, res) => {
+  const html = renderToString(
+    <StaticRouter>
+      <App/>
+    </StaticRouter>
+  );
+  console.log(html)
   res.send(
     `
     <!DOCTYPE html>
@@ -17,11 +26,12 @@ app.get('*', (req, res) => {
             <title>srr</title>
         </head>
         <body>
-            hello 
+            ${html} 
+            <script src="/client.js"></script>
         </body>
      </html>
-    `
-  )
+    `,
+  );
 });
 
-app.listen(3000,()=>console.log('server started on port:3000') )
+app.listen(3000, () => console.log('server started on port:3000'));
